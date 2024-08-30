@@ -6,7 +6,13 @@ const { connectDB } = require('./db/db.js');
 
 
 // db connection
-connectDB();
+// connectDB();
+
+const DB = process.env.DATABASE.replace('<PASSWORD>', process.env.DATABASE_PASSWORD);
+
+mongoose.connect(DB).then(() => {
+    console.log('DB connection Sucessful')
+})
 
 
 const port = process.env.PORT ||3000
