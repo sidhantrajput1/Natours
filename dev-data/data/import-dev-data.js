@@ -3,8 +3,8 @@ const fs = require('fs');
 const dotenv = require('dotenv')
 dotenv.config({ path : './config.env' })
 const mongoose  = require('mongoose');
-const Tour = require('./../../model/tourModel.js');
-const { json } = require('express');
+const Tour = require('./../../model/tourModel');
+
 
 // db connection
 // connectDB();
@@ -38,7 +38,7 @@ const importData = async () => {
 const deleteData = async () => {
     try {
         await Tour.deleteMany()
-        console.log('Data Succesfully loaded !!')
+        console.log('Data Succesfully deleted !!')
         
     } catch (error) {
         console.log(error);
@@ -46,10 +46,10 @@ const deleteData = async () => {
     process.exit();
 }
 
-if(process.argv[2] == '--import') {
+if(process.argv[2] === '--import') {
     importData();
-} else if(process.argv[2] == '--delete') {
+} else if(process.argv[2] === '--delete') {
     deleteData();
 }
 
-// console.log(process.argv)
+console.log(process.argv)

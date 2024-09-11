@@ -1,5 +1,8 @@
 const fs = require('fs');
-const Tour = require('../model/tourModel.js');
+const Tour = require('./../model/tourModel.js');
+const ApiFeatures = require('./../utils/apiFeatures.js')
+
+// const { match } = require('assert');
 
 
 // create a checkBody middleware
@@ -7,25 +10,45 @@ const Tour = require('../model/tourModel.js');
 // if not , send back 400 (bad request)
 // Add it to send post handler stack 
 
+exports.aliasTopTours = (req, res, next) => {
+    req.query.limit = '5';
+    req.query.sort = '-ratingsAverage,price';
+    req.query.fields = 'name,price,ratingsAverage,summary,difficulty';
+    next();
+  };
+
 
 
 exports.getAllTours = async (req, res) => {
-    
     try {
-        const tours = await Tour.find(req.body)
-    
+
+        // Execute query
+        const features = new ApiFeatures(Tour.find(), req.query)
+        .filter()
+        .sort()
+        .limitFields()
+        .paginate()
+        const tours = await features.query
+        
         res.status(200).json({
             status : 'success',
-            result : tours.length,
-            requestesAt : req.requestTime,
+            results : tours.length,
             data : {
                 tours
             }
         })
+
+        // res.status(200).json({
+        //     status : 'success',
+        //     results : Tour.length,
+        //     data : {
+        //         Tour
+        //     }
+        // })
     } catch (error) {
         res.status(400).json({
             status : 'fail',
-            message : err
+            message : error.message
         })
     }
 }
@@ -38,14 +61,15 @@ exports.getTours = async (req, res) => {
         // Tour.find({_id : req.params.id}) //  also used this method 
         
         res.status(200).json({
-            status : 'success',
-            data : {
-                tour
+            status: 'success',
+            results: tour.length,
+            data: {
+              tour
             }
         })
     
     } catch (error) {
-        res.status.json({
+        res.status(400).json({
             status : 'fail',
             message : error
         })
