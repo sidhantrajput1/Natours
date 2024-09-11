@@ -48,11 +48,18 @@ const tourSchema = new mongoose.Schema({
     },
     image : [String],
     startDates  : [Date],
-},{
+},
+{
     timestamps : true
-}
-)
+}, {
+    toJSON : { virtual : true },
+    toObject : { virtual : true}
+})
 
 const Tour = mongoose.model('Tour', tourSchema);
+
+tourSchema.virtual('durationWeeks').get(function () {
+    return this.duration / 7;
+})
 
 module.exports = Tour;

@@ -1,6 +1,7 @@
 const fs = require('fs');
 const Tour = require('./../model/tourModel.js');
-const ApiFeatures = require('./../utils/apiFeatures.js')
+const ApiFeatures = require('./../utils/apiFeatures.js');
+// const { fail } = require('assert');
 
 // const { match } = require('assert');
 
@@ -38,13 +39,7 @@ exports.getAllTours = async (req, res) => {
             }
         })
 
-        // res.status(200).json({
-        //     status : 'success',
-        //     results : Tour.length,
-        //     data : {
-        //         Tour
-        //     }
-        // })
+        
     } catch (error) {
         res.status(400).json({
             status : 'fail',
@@ -137,6 +132,106 @@ exports.deleteTours = async (req, res) => {
         res.status(400).json({
             status : 'fail',
             message : error
+        })
+    }
+}
+
+
+exports.getTourStats = async (req,  res) => {
+    try {
+        
+        const stats = await Tour.aggregate([
+            {
+                $match : { ratingsAverage : { $gte : 4.5 } }
+            },
+            {
+                $group : {
+                    _id : null,
+                    numTour : { $sum : 1},
+                    numRating : {$sum : '$ratingsQuantity'},
+                    avgRating : { $avg : '$ratingsAverage' },
+                    avgPrice : { $avg : '$price'},
+                    minPrice : { $min : '$price'},
+                    maxPrice : { $max : '$price'}
+                }
+            },
+            
+        ])
+
+        console.log("agregation:", stats)
+
+        res.status(200).json({
+            status : 'Success',
+            data : {
+                stats
+            }
+        })
+
+    } catch (error) {
+        res.status(400).json({
+            status : 'fail',
+            message : error.message
+        })
+    }
+}
+
+
+exports.getMonthlyPlan = async (req, res) => {
+    try {
+
+        const year = req.params.year * 1;
+        console.log('year : ', year)
+
+        const plan = await Tour.aggregate([
+            {
+                $unwind : '$startDates'
+            },
+            {
+                $match: {
+                    startDates: {
+                        $gte : new Date(`${year}-01-01`),
+                        $lte : new Date(`${year}-12-31`),
+                    }
+                }
+            },
+            {
+                $group : {
+                    _id : { $month  : '$startDates' },
+                    numTourStarts : { $sum : 1 },
+                    tours : {$push : '$name'}
+                }
+            },
+            {
+                $addFields : {
+                    month : '$_id'
+                }
+            },
+            {
+                $project  :{
+                    _id : 0
+                }
+            },
+            {
+                $sort : { numTourStarts : -1 }
+            },
+            {
+                $limit : 12
+            }
+        ])
+
+        console.log('plan : ', plan)
+
+        res.status(200).json({
+            status : 'Success',
+            data : {
+                plan
+            }
+        })
+        
+    } catch (error) {
+        res.status(400).json({
+            status : 'fail',
+            message : error.message
         })
     }
 }

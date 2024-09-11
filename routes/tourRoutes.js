@@ -5,11 +5,12 @@ const tourControllers = require('./../controllers/tourControllers.js')
 const router = express.Router();
 // router.param('id', tourControllers.checkId);
 
-// router
-//   .route('/top-5-cheap')
-//   .get(tourControllers.aliasTopTours, tourControllers.getAllTours);
+router
+  .route('/top-5-cheap')
+  .get(tourControllers.aliasTopTours, tourControllers.getAllTours);
 
-
+router.route('/tour-stats').get(tourControllers.getTourStats)
+router.route('/monthly-plan/:year').get(tourControllers.getMonthlyPlan)
   
 // app.get('/api/v1/tours', getAllTours);
 // app.post('/api/v1/tours', createNewTours);
