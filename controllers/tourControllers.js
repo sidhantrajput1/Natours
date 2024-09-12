@@ -1,6 +1,7 @@
 const fs = require('fs');
 const Tour = require('./../model/tourModel.js');
 const ApiFeatures = require('./../utils/apiFeatures.js');
+const { error } = require('console');
 // const { fail } = require('assert');
 
 // const { match } = require('assert');
@@ -38,6 +39,8 @@ exports.getAllTours = async (req, res) => {
                 tours
             }
         })
+
+        console.log(tours)
 
         
     } catch (error) {
@@ -88,10 +91,10 @@ exports.createNewTours = async (req, res) => {
                 tour : newTour
             }
         })
-    } catch (err) {
+    } catch (error) {
         res.status(400).json({
             status : 'fail',
-            message : "Invaild data sent!"
+            message : error.message || "Invalid data Sent"
         })
     }
 }
@@ -146,7 +149,7 @@ exports.getTourStats = async (req,  res) => {
             },
             {
                 $group : {
-                    _id : null,
+                    _id : { $toUpper : '$difficulty'},
                     numTour : { $sum : 1},
                     numRating : {$sum : '$ratingsQuantity'},
                     avgRating : { $avg : '$ratingsAverage' },
