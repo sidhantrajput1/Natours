@@ -2,7 +2,7 @@ const fs = require('fs');
 const Tour = require('./../model/tourModel.js');
 const ApiFeatures = require('./../utils/apiFeatures.js');
 const catchAsync = require('./../utils/catchAsync.js')
-
+const AppError = require('./../utils/appError.js')
 
 // create a checkBody middleware
 // Check if body contains name and price property
@@ -41,6 +41,10 @@ exports.getTours = catchAsync( async (req, res, next) => {
     
     const tour = await  Tour.findById(req.params.id)
     // Tour.find({_id : req.params.id}) //  also used this method 
+
+    if (!tour) {
+        return next(new AppError('No Tour Found with that ID', 404))
+    }
     
     res.status(200).json({
         status: 'success',
@@ -70,6 +74,11 @@ exports.updateTours = catchAsync( async (req, res, next) => {
         new : true,
         runValidators :true
     })
+
+    if (!tour) {
+        return next(new AppError('No Tour Found with that ID', 404))
+    }
+
     res.status(200).json({
         status : 'Success',
         data : {
@@ -83,6 +92,11 @@ exports.deleteTours = catchAsync( async (req, res, next) => {
     const tour = await Tour.findByIdAndDelete(req.params.id, req.body, {
         new : true
     })
+
+    if (!tour) {
+        return next(new AppError('No Tour Found with that ID', 404))
+    }
+    
     res.status(204)
     .json(
         {
