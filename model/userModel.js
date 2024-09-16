@@ -20,6 +20,11 @@ const userSchema = new mongoose.Schema({
         default : "",
         // required : [true, 'A User must have a iamge']
     },
+    role : {
+        type : String,
+        enum : ['user' , 'guide', 'lead-guide', 'admin'],
+        default : 'user'
+    },
     password : {
         type : String,
         required : [true, 'Please Enter a Strong password'],
@@ -36,7 +41,8 @@ const userSchema = new mongoose.Schema({
             },
             message : 'password are not the same'
         }
-    }
+    },
+    passwordChangeAt : Date
 })
 
 userSchema.pre('save' ,async function (next) {
@@ -57,6 +63,19 @@ userSchema.methods.correctPassword = async function(candidatePassword, userPassw
     return await bcrypt.compare(candidatePassword, userPassword)
 }
 
+userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
+
+    if (this.passwordChangeAt) {
+        const changeTimestamp = parseInt(this.passwordChangeAt.getTime() / 1000);
+
+        console.log(changeTimestamp, JWTTimestamp)
+
+        return JWTTimestamp < changeTimestamp;
+    }
+
+    // false means not change 
+    return false;
+}
 
 const User = mongoose.model('User', userSchema);
 

@@ -2,7 +2,8 @@ const {promisify} = require('util')
 const jwt = require('jsonwebtoken')
 const User = require('./../model/userModel.js');
 const catchAsync = require('./../utils/catchAsync.js')
-const AppError = require('./../utils/appError.js')
+const AppError = require('./../utils/appError.js');
+const { resolveSoa } = require('dns');
 
 const signToken = id => {
     return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -72,11 +73,34 @@ exports.protect = catchAsync( async (req, res, next) => {
 
     // 2. validate token || varification token
     const decode = await promisify(jwt.verify)(token , process.env.JWT_SECRET);
-    console.log(decode);
+    // console.log(decode);
     
-
     // check if user still exists 
+    const currentUser = await User.findById(decode.id);
+    if (!currentUser) {
+        return next( new AppError('The User belonging to this toekn does no longer exits. ', 401))
+    }
 
     // change if user change password after token was issued
+    if (currentUser.changedPasswordAfter(decode.iat)) {
+        return next(new AppError('User recently change password! Please login agian ', 401))
+    }
+
+
+    // Grant access to proctected route
+    req.user = currentUser;
     next()
+
 })
+
+
+exports.restrictTo = (...roles) => {
+    return (req, res, next) => {
+        // roles['admin', 'lead-guide']. role='user'
+
+        if (!roles.include(req.user.role)) {
+            return next(new AppError('You do not have permission to perform this action!', 403))
+        }
+        next();
+    }
+}
