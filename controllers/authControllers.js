@@ -1,9 +1,9 @@
-const {promisify} = require('util')
+const { promisify } = require('util');
 const jwt = require('jsonwebtoken')
 const User = require('./../model/userModel.js');
 const catchAsync = require('./../utils/catchAsync.js')
 const AppError = require('./../utils/appError.js');
-const { resolveSoa } = require('dns');
+
 
 const signToken = id => {
     return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -104,3 +104,21 @@ exports.restrictTo = (...roles) => {
         next();
     }
 }
+
+exports.forgotPassword = catchAsync( async (req, res, next) => {
+    // 1. Get user based on posted email
+    const user = await User.findOne( { email : req.body.email })
+
+    if (!user) {
+        return next( new AppError("There is no user with email address. ", 404))
+    }
+
+    // 2. generate the random reset token
+    const resetToken = user.createPasswordResetToken();
+    await user.save({ validateBeforeSave : false})
+
+    // 3. send it to user email
+})
+
+
+exports.resetPassword = catchAsync((req, res, next) => {})
