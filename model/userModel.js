@@ -1,7 +1,9 @@
 const crypto = require('crypto')
 const mongoose = require('mongoose');
 const validator = require('validator')
-const bcrypt = require('bcryptjs')
+const bcrypt = require('bcryptjs');
+const { type } = require('os');
+const catchAsync = require('../utils/catchAsync');
 // name, email, password, passwordConfirm , photo
 
 const userSchema = new mongoose.Schema({
@@ -45,8 +47,14 @@ const userSchema = new mongoose.Schema({
     },
     passwordChangeAt : Date,
     PasswordResetToken : String,
-    passwordResetExpires : Date
+    passwordResetExpires : Date,
+    active : {
+        type : Boolean,
+        default : true,
+        select : false
+    }
 })
+
 
 userSchema.pre('save' ,async function (next) {
     // only runs this function if password is actually modified  
@@ -60,6 +68,11 @@ userSchema.pre('save' ,async function (next) {
     // Delete password failed
     this.passwordConfirm = undefined;
     next();
+})
+
+userSchema.pre(/^find/, function(next) {
+    this.find( { active : { $ne : false}} ),
+    next()
 })
 
 userSchema.methods.correctPassword = async function(candidatePassword, userPassword){
