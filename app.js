@@ -10,7 +10,7 @@ const AppError = require('./utils/appError.js')
 const globalErrorHandler = require('./controllers/errorControllers.js')
 const tourRouter = require('./routes/tourRoutes.js');
 const userRouter = require('./routes/userRoutes.js');
-const { whitelist } = require('validator');
+const reviewRouter = require('./routes/reviewRoutes.js')
 
 
 // ! middlware
@@ -54,8 +54,12 @@ const limiter = rateLimit ({
 app.use('/api', limiter)
 
 
+
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
+app.use('/api/v1/reviews', reviewRouter);
+
+
 
 app.all('*', (req, res, next) => {
     // res.status(404).json({

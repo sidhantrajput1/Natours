@@ -72,7 +72,7 @@ exports.login = catchAsync( async (req, res, next) => {
 
     console.log(user)
     // If everything ok, send token to client
-    createSendToken(user, 200, res)
+    // createSendToken(user, 200, res)
     // const token = signToken(user._id)
 
     // res.status(200).json({
