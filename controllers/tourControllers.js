@@ -57,20 +57,8 @@ exports.getTours = catchAsync( async (req, res, next) => {
 })
 
 
-exports.createNewTours = catchAsync (async (req, res, next) => {
-    
-    const newTour = await Tour.create(req.body) 
-        
-    res.status(201).json({
-        status : 'Success',
-        data : {
-            tour : newTour
-        }
-    })
-})
-
+exports.createNewTours = Factory.createOne(Tour)
 exports.updateTours = Factory.updatOne(Tour);
-
 exports.deleteTours = Factory.deleteOne(Tour);
 
 
@@ -195,6 +183,16 @@ exports.deleteTours = catchAsync( async (req, res, next) => {
     )
 })
 
-
+exports.createNewTours = catchAsync (async (req, res, next) => {
+    
+    const newTour = await Tour.create(req.body) 
+        
+    res.status(201).json({
+        status : 'Success',
+        data : {
+            tour : newTour
+        }
+    })
+})
 
 */
