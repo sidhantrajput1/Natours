@@ -1,6 +1,6 @@
 const fs = require('fs');
 const Tour = require('./../model/tourModel.js');
-const ApiFeatures = require('./../utils/apiFeatures.js');
+// const ApiFeatures = require('./../utils/apiFeatures.js');
 const catchAsync = require('./../utils/catchAsync.js');
 const AppError = require('./../utils/appError.js');
 const Factory = require('./handlerFactory.js')
@@ -19,45 +19,9 @@ exports.aliasTopTours = (req, res, next) => {
 
 
 
-exports.getAllTours = catchAsync( async (req, res, next) => {
-    // Execute query
-    const features = new ApiFeatures(Tour.find(), req.query)
-    .filter()
-    .sort()
-    .limitFields()
-    .paginate()
-    const tours = await features.query
-    
-    res.status(200).json({
-        status : 'success',
-        results : tours.length,
-        data : {
-            tours
-        }
-    })
-    console.log(tours)
-})
-
-exports.getTours = catchAsync( async (req, res, next) => {
-    
-    const tour = await  Tour.findById(req.params.id).populate('reviews');
-    // Tour.find({_id : req.params.id}) //  also used this method 
-
-    if (!tour) {
-        return next(new AppError('No Tour Found with that ID', 404))
-    }
-    
-    res.status(200).json({
-        status: 'success',
-        results: tour.length,
-        data: {
-          tour
-        }
-    })
-})
-
-
-exports.createNewTours = Factory.createOne(Tour)
+exports.getAllTours = Factory.getAll(Tour)
+exports.getTours = Factory.getOne(Tour, { path : 'reviews' });
+exports.createNewTours = Factory.createOne(Tour);
 exports.updateTours = Factory.updatOne(Tour);
 exports.deleteTours = Factory.deleteOne(Tour);
 
@@ -193,6 +157,45 @@ exports.createNewTours = catchAsync (async (req, res, next) => {
             tour : newTour
         }
     })
+})
+
+
+exports.getTours = catchAsync( async (req, res, next) => {
+    
+    const tour = await  Tour.findById(req.params.id).populate('reviews');
+    // Tour.find({_id : req.params.id}) //  also used this method 
+
+    if (!tour) {
+        return next(new AppError('No Tour Found with that ID', 404))
+    }
+    
+    res.status(200).json({
+        status: 'success',
+        results: tour.length,
+        data: {
+          tour
+        }
+    })
+})
+
+
+exports.getAllTours = catchAsync( async (req, res, next) => {
+    // Execute query
+    const features = new ApiFeatures(Tour.find(), req.query)
+    .filter()
+    .sort()
+    .limitFields()
+    .paginate()
+    const tours = await features.query
+    
+    res.status(200).json({
+        status : 'success',
+        results : tours.length,
+        data : {
+            tours
+        }
+    })
+    console.log(tours)
 })
 
 */
