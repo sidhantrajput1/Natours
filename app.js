@@ -31,13 +31,16 @@ app.use(xss())
 
 // preventing parameter pollution
 
+// saving static files name
 app.use(express.static(`${__dirname}/public`))
+
 
 app.use((req, res, next) => {
     console.log('Hello from the middleware 👋');
     next();
 })
 
+// test middleware
 app.use((req, res, next) => {
     req.requestTime = new Date().toISOString();
     console.log(req.headers)
