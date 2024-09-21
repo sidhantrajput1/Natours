@@ -52,6 +52,7 @@ exports.updateMe = catchAsync(async (req, res, next) => {
 
 
 
+
 exports.deleteMe = catchAsync( async (req, res, next) => {
     await User.findByIdAndUpdate(req.body.id , { active : false})
 
@@ -77,22 +78,7 @@ exports.createUser = (req, res) => {
         message : 'This route can not yet defined 🤦‍♂️'
     })
 }
-exports.UpdateUser = (req, res) => {
-    res.status(500).json({
-        staus : 'error',
-        message : 'This route can not yet defined 🤦‍♂️'
-    })
-}
 
-
-
-
+// Do Not Update password with this
+exports.UpdateUser = Factory.updatOne(User)
 exports.deleteUser = Factory.deleteOne(User)
-
-// exports.deleteUser = (req, res) => {
-//     res.status(500).json({
-//         staus : 'error',
-//         message : 'This route can not yet defined 🤦‍♂️'
-//     })
-// }
-

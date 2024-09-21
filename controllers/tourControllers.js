@@ -69,45 +69,10 @@ exports.createNewTours = catchAsync (async (req, res, next) => {
     })
 })
 
-exports.updateTours = catchAsync( async (req, res, next) => {
-    
-    const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
-        new : true,
-        runValidators :true
-    })
-
-    if (!tour) {
-        return next(new AppError('No Tour Found with that ID', 404))
-    }
-
-    res.status(200).json({
-        status : 'Success',
-        data : {
-            tours : tour
-        }
-    })
-})
+exports.updateTours = Factory.updatOne(Tour);
 
 exports.deleteTours = Factory.deleteOne(Tour);
 
-// exports.deleteTours = catchAsync( async (req, res, next) => {
-    
-//     const tour = await Tour.findByIdAndDelete(req.params.id, req.body, {
-//         new : true
-//     })
-
-//     if (!tour) {
-//         return next(new AppError('No Tour Found with that ID', 404))
-//     }
-    
-//     res.status(204)
-//     .json(
-//         {
-//             status : 'Success',
-//             data : null
-//         }
-//     )
-// })
 
 
 
@@ -188,3 +153,48 @@ exports.getMonthlyPlan = catchAsync( async (req, res, next) => {
         }
     })
 })
+
+/* 
+
+exports.updateTours = catchAsync( async (req, res, next) => {
+    
+    const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
+        new : true,
+        runValidators :true
+    })
+
+    if (!tour) {
+        return next(new AppError('No Tour Found with that ID', 404))
+    }
+
+    res.status(200).json({
+        status : 'Success',
+        data : {
+            tours : tour
+        }
+    })
+})
+
+
+exports.deleteTours = catchAsync( async (req, res, next) => {
+    
+    const tour = await Tour.findByIdAndDelete(req.params.id, req.body, {
+        new : true
+    })
+
+    if (!tour) {
+        return next(new AppError('No Tour Found with that ID', 404))
+    }
+    
+    res.status(204)
+    .json(
+        {
+            status : 'Success',
+            data : null
+        }
+    )
+})
+
+
+
+*/
