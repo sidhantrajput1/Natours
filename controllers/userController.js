@@ -2,6 +2,7 @@ const fs = require('fs')
 const User = require('./../model/userModel.js');
 const catchAsync = require('./../utils/catchAsync.js');
 const AppError = require('./../utils/appError.js');
+const Factory = require('./handlerFactory.js')
 
 const filterObj = (obj , ...allowedFields) => {
     const newObj = {};
@@ -49,6 +50,8 @@ exports.updateMe = catchAsync(async (req, res, next) => {
 
 })
 
+
+
 exports.deleteMe = catchAsync( async (req, res, next) => {
     await User.findByIdAndUpdate(req.body.id , { active : false})
 
@@ -80,10 +83,16 @@ exports.UpdateUser = (req, res) => {
         message : 'This route can not yet defined 🤦‍♂️'
     })
 }
-exports.deleteUser = (req, res) => {
-    res.status(500).json({
-        staus : 'error',
-        message : 'This route can not yet defined 🤦‍♂️'
-    })
-}
+
+
+
+
+exports.deleteUser = Factory.deleteOne(User)
+
+// exports.deleteUser = (req, res) => {
+//     res.status(500).json({
+//         staus : 'error',
+//         message : 'This route can not yet defined 🤦‍♂️'
+//     })
+// }
 

@@ -1,8 +1,9 @@
 const fs = require('fs');
 const Tour = require('./../model/tourModel.js');
 const ApiFeatures = require('./../utils/apiFeatures.js');
-const catchAsync = require('./../utils/catchAsync.js')
-const AppError = require('./../utils/appError.js')
+const catchAsync = require('./../utils/catchAsync.js');
+const AppError = require('./../utils/appError.js');
+const Factory = require('./handlerFactory.js')
 
 // create a checkBody middleware
 // Check if body contains name and price property
@@ -87,24 +88,26 @@ exports.updateTours = catchAsync( async (req, res, next) => {
     })
 })
 
-exports.deleteTours = catchAsync( async (req, res, next) => {
-    
-    const tour = await Tour.findByIdAndDelete(req.params.id, req.body, {
-        new : true
-    })
+exports.deleteTours = Factory.deleteOne(Tour);
 
-    if (!tour) {
-        return next(new AppError('No Tour Found with that ID', 404))
-    }
+// exports.deleteTours = catchAsync( async (req, res, next) => {
     
-    res.status(204)
-    .json(
-        {
-            status : 'Success',
-            data : null
-        }
-    )
-})
+//     const tour = await Tour.findByIdAndDelete(req.params.id, req.body, {
+//         new : true
+//     })
+
+//     if (!tour) {
+//         return next(new AppError('No Tour Found with that ID', 404))
+//     }
+    
+//     res.status(204)
+//     .json(
+//         {
+//             status : 'Success',
+//             data : null
+//         }
+//     )
+// })
 
 
 
