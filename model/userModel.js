@@ -70,6 +70,13 @@ userSchema.pre('save' ,async function (next) {
     next();
 })
 
+userSchema.pre('save' , function(next) {
+    if(!this.isModified('password') || this.isNew) return next(); 
+
+    this.passwordChangeAt = Date.now() - 1000
+    next()
+})
+
 userSchema.pre(/^find/, function(next) {
     this.find( { active : { $ne : false}} ),
     next()
@@ -105,12 +112,7 @@ userSchema.methods.createPasswordResetToken = function() {
     return resetToken;
 }
 
-userSchema.pre('save ', function () {
-    if(this.isModified('password') || this.isNew()) return next();
 
-    this.passwordChangeAt = Date.now() - 1000;
-    next();
-})
 
 const User = mongoose.model('User', userSchema);
 

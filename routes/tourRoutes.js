@@ -40,7 +40,11 @@ router.route('/monthly-plan/:year').get(tourControllers.getMonthlyPlan)
 router
    .route('/')
    .get(authController.protect,  tourControllers.getAllTours)
-   .post( tourControllers.createNewTours);
+   .post(
+      authController.protect, 
+      authController.restrictTo('admin lead-guide'), 
+      tourControllers.createNewTours
+   );
 
 router
    .route('/:id')
