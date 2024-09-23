@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const Tour = require('./tourModel');
+const { findByIdAndDelete, findByIdAndUpdate } = require('./userModel');
 
 // review / rating / createdAt / ref to tour / ref to user
 const reviewSchema = new mongoose.Schema(
@@ -34,19 +36,68 @@ const reviewSchema = new mongoose.Schema(
     }
 )
 
-const Review = mongoose.model('Review' , reviewSchema);
-
-
 reviewSchema.pre(/^find/, function(next)  {
+    // this.populate({
+    //     path : 'tour',
+    //     select : 'name' 
+    // }).populate({
+    //     path : 'user',
+    //     select : 'name photo'
+    // })
+
     this.populate({
-        path : 'tour',
-        select : 'name' 
-    }).populate({
         path : 'user',
-        select : 'name photo'
+        select : 'name' 
     })
 
     next();
 })
+
+
+reviewSchema.static.calcAverageRatings = async function(tourId) {
+    console.log(tourId);
+    
+    const stats = await this.aggregate([
+        {
+            $match : { tour :  tourId}
+        },
+        {
+            $group : {
+                _id : '$tour',
+                nRating : { $sum : 1},
+                avgRating : { $avg : '$rating'}
+            }
+        }
+    ])
+    console.log(stats); 
+    if(stats.length > 0) {
+    Tour.findById(tourId, {
+        ratingsQuantity : stats[0].nRating, 
+        ratingsAverage : stats[0].avgRating
+    })
+   }
+}
+
+reviewSchema.pre('save', function(next) {
+    // this points to current review 
+    this.constructor.calcAverageRatings(this.tour);
+    next();
+
+})
+
+// findByIdAndDelete
+// findByIdAndUpdate
+reviewSchema.pre(/^findOneAnd/, async function (next) {
+    this.rev = await this.findOne()
+    console.log(this.rev);
+    next();
+})
+
+reviewSchema.post(/^findOneAnd/ , async function(next) {
+    // this.rev = await this.findOne() // Does not Work  here , query has already executed
+    await this.rev.constructor.calcAverageRatings(this.rev.tour)
+})
+
+const Review = mongoose.model('Review' , reviewSchema);
 
 module.exports = Review;
