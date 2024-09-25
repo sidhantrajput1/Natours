@@ -106,6 +106,53 @@ exports.getMonthlyPlan = catchAsync( async (req, res, next) => {
     })
 })
 
+
+
+
+// /tours-within/:distance/center/:latlng/unit/:unit
+// /tours-distance?distance=233&center=-40,45&unit=mi
+// tour-distance/233/center/28.42929042304711, 77.50196015849835/unit/mi
+
+
+exports.getToursWithin = catchAsync (async (req, res, next) => {
+    const { distance, latlng, unit } = req.params;
+    // const [lat , lng] = latlng.split(',');
+
+    if (isNaN(distance)) {
+        return next(new AppError('Please provide a valid distance as a number.', 400));
+    }
+
+    const [lat, lng] = latlng ? latlng.split(',') : [];
+
+    const radius = unit === 'mi' ? distance / 3963.2 : distance / 6378.1;
+
+    if(!lat || !lng) {
+        next( new AppError(
+            'Please provide latitutr and longitude in the format lat,lng.',
+            400
+        ))
+    }
+
+
+    console.log(distance, lat, lng, unit);
+
+    const tours = await Tour.find( { 
+        startLocation: {
+            $geoWithin: {
+                $centerSphere: [[lng, lat], radius]
+            }
+        }
+    } );
+
+    res.status(200).json({
+        status : 'Success',
+        results : tours.length,
+        data : {
+            data : tours
+        }
+    })
+})
+
 /* 
 
 exports.updateTours = catchAsync( async (req, res, next) => {

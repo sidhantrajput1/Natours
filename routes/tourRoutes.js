@@ -46,6 +46,10 @@ router
       tourControllers.createNewTours
    );
 
+router.route('/tours-within/:distance/center/:latlng/unit/:unit').get( tourControllers.getToursWithin )
+// /tours-within?distance=233&center=-40,45&unit=mi
+// tour-within/233/center/-40,45/unit/mi
+
 router
    .route('/:id')
    .get(tourControllers.getTours)
